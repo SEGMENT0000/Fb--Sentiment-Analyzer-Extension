@@ -82,14 +82,6 @@ _Coming soon: GIF or video showcasing the extension in action_
 
 ---
 
-## 🧠 Technology Stack
-
-- **Frontend**: Vanilla JavaScript (ES6+)
-- **Sentiment Analysis**: Custom local ML algorithm
-- **UI Framework**: Pure CSS3 with animations
-- **Architecture**: Chrome Extension Manifest V3
-
----
 
 ## 🔧 Development
 
@@ -153,4 +145,5 @@ Our **local sentiment engine** uses:
 **Connect with AYUSH:**
 - 🌐 Portfolio: [portfolioxayush.vercel.app](https://portfolioxayush.vercel.app)
 - 📧 Email: Available on portfolio
+
 - 💼 LinkedIn: Available on portfolio
