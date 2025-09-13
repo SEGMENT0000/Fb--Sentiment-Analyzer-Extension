@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "FB Sentiment Analyzer",
+  "version": "1.0.0",
+  "description": "Analyze Facebook post comments sentiment locally no internet required. No data is sent to any server. All processing is done on your device.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.facebook.com/*",
+    "https://facebook.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.facebook.com/*/posts/*",
+        "https://www.facebook.com/*/activity/*",
+        "https://www.facebook.com/photo.php*",
+        "https://www.facebook.com/*/photos/*",
+        "https://www.facebook.com/photos/*",
+        "https://www.facebook.com/permalink.php*",
+        "https://www.facebook.com/*/videos/*",
+        "https://www.facebook.com/photo*",
+        "https://www.facebook.com/watch/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FB Sentiment Analyzer"
+  }
+}

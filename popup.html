@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FB Sentiment Analyzer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header Section -->
+    <header class="header">
+      <div class="header-top">
+        <div class="logo-section">
+          <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 9L12 6L16 10L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="9" r="1" fill="currentColor"/>
+              <circle cx="12" cy="6" r="1" fill="currentColor"/>
+              <circle cx="16" cy="10" r="1" fill="currentColor"/>
+              <circle cx="22" cy="4" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <h1 class="title">FB Sentiment Analyzer</h1>
+        </div>
+        <button class="refresh-button" id="refreshButton" title="Refresh Comments">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 3v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 21v-5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="stats-overview" id="statsOverview">
+        <div class="stat-item">
+          <span class="stat-number" id="totalComments">0</span>
+          <span class="stat-label">Comments</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="overallSentiment">--</span>
+          <span class="stat-label">Overall</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-container" id="loadingContainer">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Analyzing comments...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-container" id="errorContainer" style="display: none;">
+      <div class="error-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 17.02L12.01 16.991" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="error-text" id="errorText">Unable to analyze comments</p>
+      <button class="retry-button" id="retryButton">Try Again</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" style="display: none;">
+      <!-- Analytics Section -->
+      <section class="analytics-section">
+        <h2 class="section-title">Sentiment Distribution</h2>
+        <div class="chart-container">
+          <canvas id="sentimentChart" width="300" height="150"></canvas>
+        </div>
+        <div class="sentiment-stats">
+          <div class="sentiment-stat positive">
+            <div class="sentiment-bar">
+              <div class="sentiment-fill" id="positiveBar"></div>
+            </div>
+            <span class="sentiment-label">Positive</span>
+            <span class="sentiment-percentage" id="positivePercentage">0%</span>
+          </div>
+          <div class="sentiment-stat neutral">
+            <div class="sentiment-bar">
+              <div class="sentiment-fill" id="neutralBar"></div>
+            </div>
+            <span class="sentiment-label">Neutral</span>
+            <span class="sentiment-percentage" id="neutralPercentage">0%</span>
+          </div>
+          <div class="sentiment-stat negative">
+            <div class="sentiment-bar">
+              <div class="sentiment-fill" id="negativeBar"></div>
+            </div>
+            <span class="sentiment-label">Negative</span>
+            <span class="sentiment-percentage" id="negativePercentage">0%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comment Highlights Section -->
+      <section class="highlights-section">
+        <h2 class="section-title">Comment Highlights</h2>
+        
+        <div class="highlight-tabs">
+          <button class="tab-button active" id="positiveTab" data-tab="positive">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 13L10 16L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Top Positive</span>
+          </button>
+          <button class="tab-button" id="negativeTab" data-tab="negative">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Top Negative</span>
+          </button>
+        </div>
+
+        <div class="comments-container" id="commentsContainer">
+          <div class="tab-content active" id="positiveComments">
+            <div class="no-comments" id="noPositiveComments">
+              <div class="no-comments-icon">+</div>
+              <p>No positive comments detected</p>
+            </div>
+          </div>
+          <div class="tab-content" id="negativeComments">
+            <div class="no-comments" id="noNegativeComments">
+              <div class="no-comments-icon">−</div>
+              <p>No negative comments detected</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+      <div class="footer-content">
+        <span class="credit-text">Created by </span>
+        <a href="https://portfolioxayush.vercel.app" target="_blank" class="credit-link" id="creditLink">
+          AYUSH
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="sentiment-analyzer.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
